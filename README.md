@@ -37,3 +37,10 @@ python inference.py -m ./models/auto_woe.pkl -d ./dataset.csv
 Модели | auto_woe | lightgbm |
 --- | --- | --- |
 Качество ROC AUC | 0.73 | 0.75 |  |
+
+### Выходные данные
+Важные фичи
+output/feat_imp.png
+
+Скоры по предсказанию
+output/prediction.csv
