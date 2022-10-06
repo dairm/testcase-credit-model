@@ -1,0 +1,2449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimal-ui">
+    <title>AutoWoE validation report</title>
+</head>
+<style>
+    table,
+    th,
+    td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        padding: 5px;
+    }
+
+    /* Remove default bullets */
+    ul,
+    #myUL {
+        list-style-type: none;
+    }
+
+    /* Remove margins and padding from the parent ul */
+    #myUL {
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Style the caret/arrow */
+    .caret {
+        cursor: pointer;
+        user-select: none;
+        /* Prevent text selection */
+    }
+
+    /* Create the caret/arrow with a unicode, and style it */
+    .caret::before {
+        content: "\25B6";
+        color: black;
+        display: inline-block;
+        margin-right: 6px;
+    }
+
+    /* Rotate the caret/arrow icon when clicked on (using JavaScript) */
+    .caret-down::before {
+        transform: rotate(90deg);
+    }
+
+    /* Hide the nested list */
+    .nested {
+        display: none;
+    }
+
+    /* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
+    .active {
+        display: block;
+    }
+</style>
+<script src="shap.js"></script>
+
+<body>
+    <div>
+        <h1>AutoWoE automatically generated report</h1>
+        <hr>
+        <h2>BASELINE</h2>
+        <h3>Report version: 1</h3>
+        <h3>Almaty, 2022</h3>
+        <hr>
+    </div>
+    <!--
+    <div>
+        <h2>Оглавление</h2>
+        <ul style="list-style-type:disc;">
+            <li>
+                <a href="#section1">1. Общие положения</a>
+                <ul style="list-style-type:circle;">
+                    <li><a href="#section1_1">1.1. Цель документа</a></li>
+                    <li><a href="#section1_2">1.2. Цели и задачи, для которых требуется построение модели</a></li>
+                    <li><a href="#section1_3">1.3. Структура документа</a></li>
+                    <li><a href="#section1_4">1.4. Сводная информация по модели</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#section2">2. Структура модели</a>
+                <ul style="list-style-type:circle;">
+                    <li><a href="#section2_1">2.1. Коэффициенты регрессионной модели</a></li>
+                    <li><a href="#section2_2">2.2. Разбиение признаков на бины и WoE значения в них</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#section3">3. Валидационные тесты</a>
+                <ul style="list-style-type:circle;">
+                    <li><a href="#section3_1">3.1. Отличия в числе пропусков между обучающей и тестовой выборкой</a>
+                    </li>
+                    <li><a href="#section3_2">3.2. Качество классификации по каждому из признаков финальной модели</a>
+                    </li>
+                    <li><a href="#section3_3">3.3. Доверительный интервал для индекса Джини</a></li>
+                    <li><a href="#section3_4">3.4. P-value на коэффициенты модели</a></li>
+                    <li><a href="#section3_5">3.5. Одномерный анализ</a></li>
+                    <li><a href="#section3_6">3.6. Проверка на монотонность</a></li>
+                    <li><a href="#section3_7">3.7. Проверка на люфт</a></li>
+                    <li><a href="#section3_8">3.8. Проверка на VIF</a></li>
+                    <li><a href="#section3_9">3.9. PSI</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#section4">4. Дополнительные отчеты</a>
+                <ul style="list-style-type:circle;">
+                    <li><a href="#section4_1">4.1. Статистики по бинам предсказания</a></li>
+                    <li><a href="#section4_2">4.2. Корреляции по факторам, вошедшим в модель</a></li>
+                    <li><a href="#section4_3">4.3. Скоринговая карта</a></li>
+                    <li><a href="#section4_4">4.4. История отбора признаков</a></li>
+                    <li><a href="#section4_5">4.5. Вклад каждой переменной в модель</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    -->
+    <ul id="myUL">
+        <li>
+            <h2 class="caret caret-down" id="section1">1. General Provisions</h2>
+            <ul class="nested active">
+                <li>
+                    <h3 class="caret" id="section1_1">1.1. Purpose of the Document</h3>
+                    <ul class="nested">
+                        <p>This report is made to ensure the continuity of business processes, preserve and
+                            share internal organization expertise within the Group, as well as to prove the feasibility
+                            and validity of the developed model.</p>
+                        <p>To achieve the goals, the Report provides insights into some essential methodological
+                            approaches to modeling.</p>
+                    </ul>
+                </li>
+                <li>
+                    <h3 class="caret" id="section1_2">1.2. Goals and Tasks which Require Building a Model</h3>
+                    <ul class="nested">
+                        <li>
+                            <p>baseline</p>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <h3 class="caret" id="section1_3">1.3. Document Structure</h3>
+                    <ul class="nested">
+                        <p>The report has the following structure:</p>
+                        <ul style="list-style-type:disc;">
+                            <li>Section <a href="#section2">Model structure</a> contains model description:
+                                features,
+                                coefficients of the regression model, splitting features into bins.
+                            </li>
+                            <li>Section <a href="#section3">Validation tests</a> contains information about validation
+                                tests.
+                            </li>
+
+                        </ul>
+                    </ul>
+                </li>
+                <li>
+                    <h3 class="caret" id="section1_4">1.4. Model Summary</h3>
+                    <ul class="nested">
+                        <p>Key model identifiers are given in Table 1.</p>
+                        <h4>Table 1. Model identifiers</h4>
+                        <table style="width:100%">
+                            <tr>
+                                <th width="30%">Parameter</th>
+                                <th width="70%">Value</th>
+                            </tr>
+                            <tr>
+                                <td><b>Model name / ID</b></td>
+                                <td>baseline_logreg</td>
+                            </tr>
+                            <tr>
+                                <td><b>Report version</b></td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td><b>Model customer</b></td>
+                                <td>test</td>
+                            </tr>
+                            <tr>
+                                <td><b>Name of the Group member and high level department</b></td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td><b>Model developer (if an external developer is involved, it is necessary
+                                        to indicate Company's name)</b></td>
+                                <td>1</td>
+                            </tr>
+                        </table>
+
+                        <p>Description and specification of datasets that are used to develop and test the model
+                            are presented in Table
+                            2.</p>
+                        <h4>Table 2. Summary of data sets used to build the model</h4>
+                        <table style="width:100%">
+                            <tr>
+                                <td width="20%"><strong>Parameter</strong></td>
+                                <td width="16%"><strong>Training set</strong></td>
+                                <td width="16%"><strong>Test set</strong></td>
+                            </tr>
+                            <tr>
+                                <td><b>Target event description</b></td>
+                                <td colspan="5">1</td>
+                            </tr>
+                            <tr>
+                                <td><b>Non-target event description</b></td>
+                                <td colspan="5">1</td>
+                            </tr>
+                            <tr>
+                                <td><b>Observations count in sets</b></td>
+                                <td>114399</td>
+                                <td>56347</td>
+                            </tr>
+                            <tr>
+                                <td><b>Target events count</b></td>
+                                <td>20177</td>
+                                <td>9879</td>
+                            </tr>
+                            <tr>
+                                <td><b>Non-target events count</b></td>
+                                <td>94222</td>
+                                <td>46468</td>
+                            </tr>
+                            <tr>
+                                <td><b>Mean of target in sets</b></td>
+                                <td>17.64%</td>
+                                <td>17.53%</td>
+                            </tr>
+                        </table>
+
+                        <p>Predictions of the model trained on the training set are shown in Table 3.</p>
+                        <h4>Table 3. Model predictions (trained using the training set)</h4>
+                        <table style="width:100%">
+                            <tr>
+                                <td width="20%"><strong>Parameter</strong></td>
+                                <td width="40%"><strong>Training set</strong></td>
+                                <td width="40%"><strong>Test set</strong></td>
+                            </tr>
+                            <tr>
+                                <td><b>AUC</b></td>
+                                <td>73.00%</td>
+                                <td>73.21%</td>
+                            </tr>
+                            <tr>
+                                <td><b>Gini</b></td>
+                                <td>45.99%</td>
+                                <td>46.43%</td>
+                            </tr>
+                        </table>
+                        <p><img src="AUC_test_plot_full.png" alt="AUC test plot full"></p>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <h2 class="caret caret-down" id="section2">2. Model Structure</h2>
+            <ul class="nested active">
+                <li>
+                    <h3 class="caret" id="section2_1">2.1. Coefficients of the Regression Model</h3>
+                    <ul class="nested">
+                        <p>Coefficients of the regression model are shown in Table 4.</p>
+                        <h4>Table 4. Coefficients of the regression model</h4>
+                        <table style="width:100%">
+                            <tr>
+                                <td width="40%"><strong>Feature name</strong></td>
+                                <td width="40%"><strong>Regression coefficient</strong></td>
+                            </tr>
+                            
+                            <tr>
+                                <td>score_shk</td>
+                                <td>-1.314003</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>tariff_id</td>
+                                <td>-1.293046</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_month</td>
+                                <td>-1.243952</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>gender_F</td>
+                                <td>-1.07398</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>age</td>
+                                <td>-0.839685</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>living_region</td>
+                                <td>-0.672387</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>education_SCH</td>
+                                <td>-0.655881</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_MAR</td>
+                                <td>-0.648012</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_sum</td>
+                                <td>-0.593555</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_SPC</td>
+                                <td>-0.567185</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_PNA</td>
+                                <td>-0.497249</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_count</td>
+                                <td>-0.297202</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_ATP</td>
+                                <td>-0.127529</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_UNM</td>
+                                <td>-0.030375</td>
+                            </tr>
+                            
+                        </table>
+                        <p><img src="Model_weights.png" alt="Model weights"></p>
+                    </ul>
+                </li>
+                <li>
+                    <h3 class="caret" id="section2_2">2.2. Splitting Features into Bins and WoE Values ​​in them</h3>
+                    <ul class="nested">
+                        <p></p>
+                        
+                        <p><img src=tariff_id_woe.png alt="tariff_id_woe.png" /></p>
+                        
+                        <p><img src=credit_month_woe.png alt="credit_month_woe.png" /></p>
+                        
+                        <p><img src=credit_sum_woe.png alt="credit_sum_woe.png" /></p>
+                        
+                        <p><img src=education_SCH_woe.png alt="education_SCH_woe.png" /></p>
+                        
+                        <p><img src=age_woe.png alt="age_woe.png" /></p>
+                        
+                        <p><img src=marital_status_MAR_woe.png alt="marital_status_MAR_woe.png" /></p>
+                        
+                        <p><img src=marital_status_UNM_woe.png alt="marital_status_UNM_woe.png" /></p>
+                        
+                        <p><img src=score_shk_woe.png alt="score_shk_woe.png" /></p>
+                        
+                        <p><img src=credit_count_woe.png alt="credit_count_woe.png" /></p>
+                        
+                        <p><img src=living_region_woe.png alt="living_region_woe.png" /></p>
+                        
+                        <p><img src=gender_F_woe.png alt="gender_F_woe.png" /></p>
+                        
+                        <p><img src=job_position_SPC_woe.png alt="job_position_SPC_woe.png" /></p>
+                        
+                        <p><img src=job_position_PNA_woe.png alt="job_position_PNA_woe.png" /></p>
+                        
+                        <p><img src=job_position_ATP_woe.png alt="job_position_ATP_woe.png" /></p>
+                        
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <h2 class="caret caret-down" id="section3">3. Validation Tests</h2>
+            <ul class="nested active">
+                <li>
+                    <h3 class="caret" id="section3_1">3.1. Differences in the Number of Missing Values between Training
+                        and Test Sets
+                    </h3>
+                    <ul class="nested">
+                        <p>Statistics related to the number of missing values between training and test sets are shown
+                            in Table 5.</p>
+                        <h4>Table 5. Missing values</h4>
+                        <table style="width:100%">
+                            <tr>
+                                <td width="40%"><strong>Feature name</strong></td>
+
+                                <td width="40%"><strong>Number of valid values in the training set</strong></td>
+                                <td width="40%"><strong>Number of valid values in the test set</strong></td>
+
+                                <td width="40%"><strong>Number of missing values in the training set</strong></td>
+                                <td width="40%"><strong>Number of missing values in the test set</strong></td>
+
+                                <td width="40%"><strong>Percentage of valid values in the training set</strong></td>
+                                <td width="40%"><strong>Percentage of valid values in the test set</strong></td>
+
+                                <td width="40%"><strong>Difference in percentage of valid values ​​in sets</strong></td>
+                            </tr>
+                            
+                            <tr>
+                                <td>score_shk</td>
+                                <td>114399</td>
+                                <td>56347</td>
+                                <td>0</td>
+
+                                <td>0</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>tariff_id</td>
+                                <td>114399</td>
+                                <td>56347</td>
+                                <td>0</td>
+
+                                <td>0</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_month</td>
+                                <td>114399</td>
+                                <td>56347</td>
+                                <td>0</td>
+
+                                <td>0</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>gender_F</td>
+                                <td>114399</td>
+                                <td>56347</td>
+                                <td>0</td>
+
+                                <td>0</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>age</td>
+                                <td>114399</td>
+                                <td>56347</td>
+                                <td>0</td>
+
+                                <td>0</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>living_region</td>
+                                <td>114399</td>
+                                <td>56347</td>
+                                <td>0</td>
+
+                                <td>0</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>education_SCH</td>
+                                <td>114399</td>
+                                <td>56347</td>
+                                <td>0</td>
+
+                                <td>0</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_MAR</td>
+                                <td>114399</td>
+                                <td>56347</td>
+                                <td>0</td>
+
+                                <td>0</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_sum</td>
+                                <td>114399</td>
+                                <td>56347</td>
+                                <td>0</td>
+
+                                <td>0</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_SPC</td>
+                                <td>114399</td>
+                                <td>56347</td>
+                                <td>0</td>
+
+                                <td>0</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_PNA</td>
+                                <td>114399</td>
+                                <td>56347</td>
+                                <td>0</td>
+
+                                <td>0</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_count</td>
+                                <td>114399</td>
+                                <td>56347</td>
+                                <td>0</td>
+
+                                <td>0</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_ATP</td>
+                                <td>114399</td>
+                                <td>56347</td>
+                                <td>0</td>
+
+                                <td>0</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_UNM</td>
+                                <td>114399</td>
+                                <td>56347</td>
+                                <td>0</td>
+
+                                <td>0</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                                <td>0.00</td>
+                            </tr>
+                            
+                        </table>
+                    </ul>
+                </li>
+
+                <li>
+                    <h3 class="caret" id="section3_2">3.2. Classification Quality for Each of the Final Model's
+                        features</h3>
+                    <ul class="nested">
+                        <p></p>
+                        
+                        <p><img src=tariff_id_roc_auc.png alt="tariff_id_roc_auc.png" /></p>
+                        
+                        <p><img src=credit_month_roc_auc.png alt="credit_month_roc_auc.png" /></p>
+                        
+                        <p><img src=credit_sum_roc_auc.png alt="credit_sum_roc_auc.png" /></p>
+                        
+                        <p><img src=education_SCH_roc_auc.png alt="education_SCH_roc_auc.png" /></p>
+                        
+                        <p><img src=age_roc_auc.png alt="age_roc_auc.png" /></p>
+                        
+                        <p><img src=marital_status_MAR_roc_auc.png alt="marital_status_MAR_roc_auc.png" /></p>
+                        
+                        <p><img src=marital_status_UNM_roc_auc.png alt="marital_status_UNM_roc_auc.png" /></p>
+                        
+                        <p><img src=score_shk_roc_auc.png alt="score_shk_roc_auc.png" /></p>
+                        
+                        <p><img src=credit_count_roc_auc.png alt="credit_count_roc_auc.png" /></p>
+                        
+                        <p><img src=living_region_roc_auc.png alt="living_region_roc_auc.png" /></p>
+                        
+                        <p><img src=gender_F_roc_auc.png alt="gender_F_roc_auc.png" /></p>
+                        
+                        <p><img src=job_position_SPC_roc_auc.png alt="job_position_SPC_roc_auc.png" /></p>
+                        
+                        <p><img src=job_position_PNA_roc_auc.png alt="job_position_PNA_roc_auc.png" /></p>
+                        
+                        <p><img src=job_position_ATP_roc_auc.png alt="job_position_ATP_roc_auc.png" /></p>
+                        
+                    </ul>
+                </li>
+
+                <li>
+                    <h3 class="caret" id="section3_3">3.3. Confidence Interval for Gini Index</h3>
+                    <ul class="nested">
+                        <span>95% confidence interval for Gini index:</span>
+                        <ul>
+                            <li>- In the <strong>training</strong> set: <strong>(0.453, 0.467)</strong></li>
+                            <li>- In the <strong>test</strong> set: <strong>(0.453, 0.475)</strong></li>
+                        </ul>
+                    </ul>
+                </li>
+
+                <li>
+                    <h3 class="caret" id="section3_4">3.4. P-value for Model Coefficients</h3>
+                    <ul class="nested">
+                        
+                        <p>Required to train model with a parameter <strong>regularized_refit=False</strong></p>
+                        
+                    </ul>
+                </li>
+
+                <li>
+                    <h3 class="caret" id="section3_5">3.5. One-dimensional Analysis</h3>
+                    <ul class="nested">
+                        <p>Gini for the training set</p>
+                        <p><img src="train_enc_ginis.png" alt="Train_enc ginis"></p>
+                        <p>Gini for the test set</p>
+                        <p><img src="test_enc_ginis.png" alt="Test_enc ginis"></p>
+                    </ul>
+                </li>
+
+                <li>
+                    <h3 class="caret" id="section3_6">3.6. Check for Monotony</h3>
+                    <ul class="nested">
+                        <p></p>
+                        
+                        <p><img src=tariff_id_woe_bars.png alt="tariff_id_woe_bars.png" /></p>
+                        
+                        <p><img src=credit_month_woe_bars.png alt="credit_month_woe_bars.png" /></p>
+                        
+                        <p><img src=credit_sum_woe_bars.png alt="credit_sum_woe_bars.png" /></p>
+                        
+                        <p><img src=education_SCH_woe_bars.png alt="education_SCH_woe_bars.png" /></p>
+                        
+                        <p><img src=age_woe_bars.png alt="age_woe_bars.png" /></p>
+                        
+                        <p><img src=marital_status_MAR_woe_bars.png alt="marital_status_MAR_woe_bars.png" /></p>
+                        
+                        <p><img src=marital_status_UNM_woe_bars.png alt="marital_status_UNM_woe_bars.png" /></p>
+                        
+                        <p><img src=score_shk_woe_bars.png alt="score_shk_woe_bars.png" /></p>
+                        
+                        <p><img src=credit_count_woe_bars.png alt="credit_count_woe_bars.png" /></p>
+                        
+                        <p><img src=living_region_woe_bars.png alt="living_region_woe_bars.png" /></p>
+                        
+                        <p><img src=gender_F_woe_bars.png alt="gender_F_woe_bars.png" /></p>
+                        
+                        <p><img src=job_position_SPC_woe_bars.png alt="job_position_SPC_woe_bars.png" /></p>
+                        
+                        <p><img src=job_position_PNA_woe_bars.png alt="job_position_PNA_woe_bars.png" /></p>
+                        
+                        <p><img src=job_position_ATP_woe_bars.png alt="job_position_ATP_woe_bars.png" /></p>
+                        
+                    </ul>
+                </li>
+
+                <li>
+                    <h3 class="caret" id="section3_7">3.7. Check for Backlash</h3>
+                    <ul class="nested">
+                        <p></p>
+                        
+                        <p><img src=tariff_id_backlash_plot.png alt="tariff_id_backlash_plot.png" /></p>
+                        
+                        <p><img src=credit_month_backlash_plot.png alt="credit_month_backlash_plot.png" /></p>
+                        
+                        <p><img src=credit_sum_backlash_plot.png alt="credit_sum_backlash_plot.png" /></p>
+                        
+                        <p><img src=education_SCH_backlash_plot.png alt="education_SCH_backlash_plot.png" /></p>
+                        
+                        <p><img src=age_backlash_plot.png alt="age_backlash_plot.png" /></p>
+                        
+                        <p><img src=marital_status_MAR_backlash_plot.png alt="marital_status_MAR_backlash_plot.png" /></p>
+                        
+                        <p><img src=marital_status_UNM_backlash_plot.png alt="marital_status_UNM_backlash_plot.png" /></p>
+                        
+                        <p><img src=score_shk_backlash_plot.png alt="score_shk_backlash_plot.png" /></p>
+                        
+                        <p><img src=credit_count_backlash_plot.png alt="credit_count_backlash_plot.png" /></p>
+                        
+                        <p><img src=living_region_backlash_plot.png alt="living_region_backlash_plot.png" /></p>
+                        
+                        <p><img src=gender_F_backlash_plot.png alt="gender_F_backlash_plot.png" /></p>
+                        
+                        <p><img src=job_position_SPC_backlash_plot.png alt="job_position_SPC_backlash_plot.png" /></p>
+                        
+                        <p><img src=job_position_PNA_backlash_plot.png alt="job_position_PNA_backlash_plot.png" /></p>
+                        
+                        <p><img src=job_position_ATP_backlash_plot.png alt="job_position_ATP_backlash_plot.png" /></p>
+                        
+                    </ul>
+                </li>
+
+                <li>
+                    <h3 class="caret" id="section3_8">3.8. Check for VIF</h3>
+                    <ul class="nested">
+                        
+                        <table>
+                            <tr>
+                                <td><strong>Feature name</strong></td>
+                                <td><strong>VIF value</strong></td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_UNM</td>
+                                <td>2.299257</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_MAR</td>
+                                <td>2.235804</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_SPC</td>
+                                <td>1.226605</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_PNA</td>
+                                <td>1.164176</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>age</td>
+                                <td>1.157263</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>score_shk</td>
+                                <td>1.147076</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>tariff_id</td>
+                                <td>1.103925</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_ATP</td>
+                                <td>1.093957</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>education_SCH</td>
+                                <td>1.093699</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_sum</td>
+                                <td>1.079596</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_month</td>
+                                <td>1.068065</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_count</td>
+                                <td>1.059691</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>gender_F</td>
+                                <td>1.040532</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>living_region</td>
+                                <td>1.027151</td>
+                            </tr>
+                            
+                        </table>
+                        
+                    </ul>
+                </li>
+
+                <li>
+                    <h3 class="caret" id="section3_9">3.9. PSI</h3>
+                    <ul class="nested">
+                        
+                        <p>Total PSI</p>
+                        <table>
+                            <tr>
+                                <td><strong>Feature name</strong></td>
+                                <td><strong>PSI value</strong></td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_sum</td>
+                                <td>0.000193</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>score_shk</td>
+                                <td>9.3e-05</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>living_region</td>
+                                <td>9e-05</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>gender_F</td>
+                                <td>7.7e-05</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>tariff_id</td>
+                                <td>6.5e-05</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>age</td>
+                                <td>2.6e-05</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_ATP</td>
+                                <td>1.5e-05</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>education_SCH</td>
+                                <td>1.4e-05</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_PNA</td>
+                                <td>9e-06</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_count</td>
+                                <td>8e-06</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_month</td>
+                                <td>4e-06</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_UNM</td>
+                                <td>1e-06</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_SPC</td>
+                                <td>1e-06</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_MAR</td>
+                                <td>0.0</td>
+                            </tr>
+                            
+                        </table>
+                        <p>PSI for non-target events</p>
+                        <table>
+                            <tr>
+                                <td><strong>Feature name</strong></td>
+                                <td><strong>PSI value</strong></td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_sum</td>
+                                <td>0.000234</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>gender_F</td>
+                                <td>0.000126</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>living_region</td>
+                                <td>0.000111</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>tariff_id</td>
+                                <td>0.000107</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>score_shk</td>
+                                <td>9.8e-05</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_count</td>
+                                <td>4.3e-05</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>age</td>
+                                <td>4.1e-05</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>education_SCH</td>
+                                <td>2.5e-05</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_month</td>
+                                <td>2.1e-05</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_ATP</td>
+                                <td>2.1e-05</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_MAR</td>
+                                <td>1e-05</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_UNM</td>
+                                <td>7e-06</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_SPC</td>
+                                <td>6e-06</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_PNA</td>
+                                <td>5e-06</td>
+                            </tr>
+                            
+                        </table>
+                        <p>PSI for target events</p>
+                        <table>
+                            <tr>
+                                <td><strong>Feature name</strong></td>
+                                <td><strong>PSI value</strong></td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_count</td>
+                                <td>0.00115</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>tariff_id</td>
+                                <td>0.001029</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>age</td>
+                                <td>0.000889</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>score_shk</td>
+                                <td>0.000715</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_PNA</td>
+                                <td>0.000382</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_sum</td>
+                                <td>0.00038</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_month</td>
+                                <td>0.00035</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_UNM</td>
+                                <td>0.000305</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_MAR</td>
+                                <td>0.000222</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>living_region</td>
+                                <td>7.9e-05</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_SPC</td>
+                                <td>3.2e-05</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>education_SCH</td>
+                                <td>1.4e-05</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>gender_F</td>
+                                <td>4e-06</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_ATP</td>
+                                <td>1e-06</td>
+                            </tr>
+                            
+                        </table>
+                        <p>Grouping by predictions on the training set (total)</p>
+                        <p><img src="binned_train_total.png" alt="binned_train_total"></p>
+                        <p>Grouping by predictions of target and non-target events on the training set</p>
+                        <p><img src="binned_train_posneg.png" alt="binned_train_posneg"></p>
+                        <p>Grouping by predictions on the test set (total)</p>
+                        <p><img src="binned_test_total.png" alt="binned_test_total"></p>
+                        <p>Grouping by predictions of target and non-target events on the test set</p>
+                        <p><img src="binned_test_posneg.png" alt="binned_test_posneg"></p>
+                        <p>PSI by grouped predictions of model</p>
+                        <table>
+                            <tr>
+                                <td><strong>Total PSI</strong></td>
+                                <td>9.9e-05</td>
+                            </tr>
+                            <tr>
+                                <td><strong>PSI for non-target events</strong></td>
+                                <td>0.000125</td>
+                            </tr>
+                            <tr>
+                                <td><strong>PSI for target events</strong></td>
+                                <td>0.000742</td>
+                            </tr>
+                        </table>
+                        
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li>
+            <h2 class="caret caret-down" id="section4">4. Additional Reports</h2>
+            <ul class="nested active">
+
+                <li>
+                    <h3 class="caret" id="section4_1">4.1. Prediction Bin Statistics</h3>
+                    <ul class="nested">
+                        <h4>Mean value of the target on the training and test set</h4>
+                        <p><img src="binned_stats_target.png" alt="binned_stats_target"></p>
+                        <h4>Prediction statistics for the training set</h4>
+                        <p><img src="binned_stats_train.png" alt="binned_stats_train"></p>
+                        
+                        <table>
+                            <tr>
+                                <td><strong>ScoreBin</strong></td>
+                                <td><strong>count</strong></td>
+                                <td><strong>mean</strong></td>
+                                <td><strong>std</strong></td>
+                                <td><strong>min</strong></td>
+                                <td><strong>25%</strong></td>
+                                <td><strong>50%</strong></td>
+                                <td><strong>75%</strong></td>
+                                <td><strong>max</strong></td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-5.405, -4.993]</strong></td>
+                                <td>7.0</td>
+                                <td>0.0055</td>
+                                <td>0.0007</td>
+                                <td>0.0045</td>
+                                <td>0.0051</td>
+                                <td>0.0059</td>
+                                <td>0.0059</td>
+                                <td>0.0062</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-4.993, -4.59]</strong></td>
+                                <td>67.0</td>
+                                <td>0.009</td>
+                                <td>0.001</td>
+                                <td>0.0069</td>
+                                <td>0.0081</td>
+                                <td>0.0093</td>
+                                <td>0.0099</td>
+                                <td>0.01</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-4.59, -4.186]</strong></td>
+                                <td>250.0</td>
+                                <td>0.0128</td>
+                                <td>0.0013</td>
+                                <td>0.0101</td>
+                                <td>0.0122</td>
+                                <td>0.0131</td>
+                                <td>0.0138</td>
+                                <td>0.015</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-4.186, -3.783]</strong></td>
+                                <td>354.0</td>
+                                <td>0.0181</td>
+                                <td>0.0018</td>
+                                <td>0.015</td>
+                                <td>0.0168</td>
+                                <td>0.0177</td>
+                                <td>0.019</td>
+                                <td>0.0222</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-3.783, -3.38]</strong></td>
+                                <td>1302.0</td>
+                                <td>0.0286</td>
+                                <td>0.0031</td>
+                                <td>0.0223</td>
+                                <td>0.0263</td>
+                                <td>0.0299</td>
+                                <td>0.0308</td>
+                                <td>0.0329</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-3.38, -2.976]</strong></td>
+                                <td>3309.0</td>
+                                <td>0.0414</td>
+                                <td>0.004</td>
+                                <td>0.033</td>
+                                <td>0.0389</td>
+                                <td>0.0406</td>
+                                <td>0.0451</td>
+                                <td>0.0485</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-2.976, -2.573]</strong></td>
+                                <td>10990.0</td>
+                                <td>0.0608</td>
+                                <td>0.0066</td>
+                                <td>0.0485</td>
+                                <td>0.0545</td>
+                                <td>0.0621</td>
+                                <td>0.0664</td>
+                                <td>0.0709</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-2.573, -2.169]</strong></td>
+                                <td>19802.0</td>
+                                <td>0.0864</td>
+                                <td>0.0086</td>
+                                <td>0.0709</td>
+                                <td>0.0794</td>
+                                <td>0.086</td>
+                                <td>0.0929</td>
+                                <td>0.1025</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-2.169, -1.766]</strong></td>
+                                <td>23419.0</td>
+                                <td>0.1227</td>
+                                <td>0.0128</td>
+                                <td>0.1025</td>
+                                <td>0.1119</td>
+                                <td>0.1213</td>
+                                <td>0.1342</td>
+                                <td>0.146</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-1.766, -1.363]</strong></td>
+                                <td>18810.0</td>
+                                <td>0.1724</td>
+                                <td>0.0168</td>
+                                <td>0.1461</td>
+                                <td>0.1567</td>
+                                <td>0.1717</td>
+                                <td>0.187</td>
+                                <td>0.2038</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-1.363, -0.959]</strong></td>
+                                <td>15559.0</td>
+                                <td>0.2382</td>
+                                <td>0.0205</td>
+                                <td>0.2038</td>
+                                <td>0.2212</td>
+                                <td>0.2371</td>
+                                <td>0.2545</td>
+                                <td>0.277</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-0.959, -0.556]</strong></td>
+                                <td>11808.0</td>
+                                <td>0.3157</td>
+                                <td>0.0254</td>
+                                <td>0.277</td>
+                                <td>0.2924</td>
+                                <td>0.3115</td>
+                                <td>0.3383</td>
+                                <td>0.3645</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-0.556, -0.152]</strong></td>
+                                <td>5270.0</td>
+                                <td>0.4059</td>
+                                <td>0.0276</td>
+                                <td>0.3646</td>
+                                <td>0.3823</td>
+                                <td>0.4028</td>
+                                <td>0.4272</td>
+                                <td>0.4619</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-0.152, 0.251]</strong></td>
+                                <td>2096.0</td>
+                                <td>0.5052</td>
+                                <td>0.0281</td>
+                                <td>0.462</td>
+                                <td>0.4807</td>
+                                <td>0.5026</td>
+                                <td>0.5271</td>
+                                <td>0.5623</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(0.251, 0.654]</strong></td>
+                                <td>950.0</td>
+                                <td>0.6013</td>
+                                <td>0.0264</td>
+                                <td>0.5626</td>
+                                <td>0.5809</td>
+                                <td>0.5976</td>
+                                <td>0.6224</td>
+                                <td>0.6573</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(0.654, 1.058]</strong></td>
+                                <td>280.0</td>
+                                <td>0.6916</td>
+                                <td>0.0245</td>
+                                <td>0.6582</td>
+                                <td>0.6662</td>
+                                <td>0.6882</td>
+                                <td>0.7106</td>
+                                <td>0.7406</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(1.058, 1.461]</strong></td>
+                                <td>96.0</td>
+                                <td>0.7701</td>
+                                <td>0.0203</td>
+                                <td>0.7424</td>
+                                <td>0.7538</td>
+                                <td>0.7679</td>
+                                <td>0.7812</td>
+                                <td>0.8101</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(1.461, 1.865]</strong></td>
+                                <td>22.0</td>
+                                <td>0.835</td>
+                                <td>0.0169</td>
+                                <td>0.8132</td>
+                                <td>0.8232</td>
+                                <td>0.8294</td>
+                                <td>0.8458</td>
+                                <td>0.8655</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(1.865, 2.268]</strong></td>
+                                <td>3.0</td>
+                                <td>0.8783</td>
+                                <td>0.0168</td>
+                                <td>0.8662</td>
+                                <td>0.8687</td>
+                                <td>0.8713</td>
+                                <td>0.8844</td>
+                                <td>0.8974</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(2.268, 2.671]</strong></td>
+                                <td>5.0</td>
+                                <td>0.9287</td>
+                                <td>0.0075</td>
+                                <td>0.9198</td>
+                                <td>0.9213</td>
+                                <td>0.9335</td>
+                                <td>0.9337</td>
+                                <td>0.9353</td>
+                            </tr>
+                            
+                        </table>
+                        
+                        <h4>Prediction statistics for the test set</h4>
+                        <p><img src="binned_stats_test.png" alt="binned_stats_test"></p>
+                        
+                        <table>
+                            <tr>
+                                <td><strong>ScoreBin</strong></td>
+                                <td><strong>count</strong></td>
+                                <td><strong>mean</strong></td>
+                                <td><strong>std</strong></td>
+                                <td><strong>min</strong></td>
+                                <td><strong>25%</strong></td>
+                                <td><strong>50%</strong></td>
+                                <td><strong>75%</strong></td>
+                                <td><strong>max</strong></td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-5.405, -4.993]</strong></td>
+                                <td>0.0</td>
+                                <td>nan</td>
+                                <td>nan</td>
+                                <td>nan</td>
+                                <td>nan</td>
+                                <td>nan</td>
+                                <td>nan</td>
+                                <td>nan</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-4.993, -4.59]</strong></td>
+                                <td>40.0</td>
+                                <td>0.0093</td>
+                                <td>0.0009</td>
+                                <td>0.0075</td>
+                                <td>0.009</td>
+                                <td>0.0098</td>
+                                <td>0.01</td>
+                                <td>0.01</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-4.59, -4.186]</strong></td>
+                                <td>125.0</td>
+                                <td>0.0128</td>
+                                <td>0.0014</td>
+                                <td>0.0102</td>
+                                <td>0.0116</td>
+                                <td>0.0132</td>
+                                <td>0.0138</td>
+                                <td>0.0148</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-4.186, -3.783]</strong></td>
+                                <td>159.0</td>
+                                <td>0.0184</td>
+                                <td>0.002</td>
+                                <td>0.0151</td>
+                                <td>0.0169</td>
+                                <td>0.018</td>
+                                <td>0.0201</td>
+                                <td>0.0222</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-3.783, -3.38]</strong></td>
+                                <td>562.0</td>
+                                <td>0.0285</td>
+                                <td>0.0031</td>
+                                <td>0.0223</td>
+                                <td>0.0254</td>
+                                <td>0.0298</td>
+                                <td>0.0308</td>
+                                <td>0.0329</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-3.38, -2.976]</strong></td>
+                                <td>1668.0</td>
+                                <td>0.0414</td>
+                                <td>0.0041</td>
+                                <td>0.033</td>
+                                <td>0.0389</td>
+                                <td>0.0406</td>
+                                <td>0.0455</td>
+                                <td>0.0484</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-2.976, -2.573]</strong></td>
+                                <td>5440.0</td>
+                                <td>0.0609</td>
+                                <td>0.0066</td>
+                                <td>0.0486</td>
+                                <td>0.0547</td>
+                                <td>0.0621</td>
+                                <td>0.0664</td>
+                                <td>0.0709</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-2.573, -2.169]</strong></td>
+                                <td>9766.0</td>
+                                <td>0.0865</td>
+                                <td>0.0085</td>
+                                <td>0.0709</td>
+                                <td>0.0795</td>
+                                <td>0.0863</td>
+                                <td>0.093</td>
+                                <td>0.1025</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-2.169, -1.766]</strong></td>
+                                <td>11599.0</td>
+                                <td>0.1225</td>
+                                <td>0.0127</td>
+                                <td>0.1026</td>
+                                <td>0.1119</td>
+                                <td>0.1212</td>
+                                <td>0.1337</td>
+                                <td>0.146</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-1.766, -1.363]</strong></td>
+                                <td>9324.0</td>
+                                <td>0.1727</td>
+                                <td>0.0169</td>
+                                <td>0.1461</td>
+                                <td>0.1569</td>
+                                <td>0.1717</td>
+                                <td>0.1885</td>
+                                <td>0.2038</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-1.363, -0.959]</strong></td>
+                                <td>7557.0</td>
+                                <td>0.2382</td>
+                                <td>0.0206</td>
+                                <td>0.2038</td>
+                                <td>0.2207</td>
+                                <td>0.2368</td>
+                                <td>0.2547</td>
+                                <td>0.277</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-0.959, -0.556]</strong></td>
+                                <td>5790.0</td>
+                                <td>0.3156</td>
+                                <td>0.0255</td>
+                                <td>0.277</td>
+                                <td>0.2921</td>
+                                <td>0.3109</td>
+                                <td>0.3383</td>
+                                <td>0.3644</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-0.556, -0.152]</strong></td>
+                                <td>2630.0</td>
+                                <td>0.4049</td>
+                                <td>0.0277</td>
+                                <td>0.3646</td>
+                                <td>0.3808</td>
+                                <td>0.4025</td>
+                                <td>0.427</td>
+                                <td>0.462</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(-0.152, 0.251]</strong></td>
+                                <td>1027.0</td>
+                                <td>0.5051</td>
+                                <td>0.027</td>
+                                <td>0.462</td>
+                                <td>0.4802</td>
+                                <td>0.5037</td>
+                                <td>0.5257</td>
+                                <td>0.562</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(0.251, 0.654]</strong></td>
+                                <td>460.0</td>
+                                <td>0.6021</td>
+                                <td>0.0267</td>
+                                <td>0.5628</td>
+                                <td>0.5816</td>
+                                <td>0.597</td>
+                                <td>0.6245</td>
+                                <td>0.658</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(0.654, 1.058]</strong></td>
+                                <td>154.0</td>
+                                <td>0.696</td>
+                                <td>0.0231</td>
+                                <td>0.66</td>
+                                <td>0.6746</td>
+                                <td>0.694</td>
+                                <td>0.7144</td>
+                                <td>0.7383</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(1.058, 1.461]</strong></td>
+                                <td>35.0</td>
+                                <td>0.7682</td>
+                                <td>0.019</td>
+                                <td>0.7423</td>
+                                <td>0.7534</td>
+                                <td>0.768</td>
+                                <td>0.775</td>
+                                <td>0.8105</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(1.461, 1.865]</strong></td>
+                                <td>10.0</td>
+                                <td>0.8348</td>
+                                <td>0.0185</td>
+                                <td>0.8133</td>
+                                <td>0.8164</td>
+                                <td>0.8374</td>
+                                <td>0.8434</td>
+                                <td>0.8624</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(1.865, 2.268]</strong></td>
+                                <td>1.0</td>
+                                <td>0.8669</td>
+                                <td>nan</td>
+                                <td>0.8669</td>
+                                <td>0.8669</td>
+                                <td>0.8669</td>
+                                <td>0.8669</td>
+                                <td>0.8669</td>
+                            </tr>
+                            
+                            <tr>
+                                <td><strong>(2.268, 2.671]</strong></td>
+                                <td>0.0</td>
+                                <td>nan</td>
+                                <td>nan</td>
+                                <td>nan</td>
+                                <td>nan</td>
+                                <td>nan</td>
+                                <td>nan</td>
+                                <td>nan</td>
+                            </tr>
+                            
+                        </table>
+                        
+                    </ul>
+                </li>
+
+                <li>
+                    <h3 class="caret" id="section4_2">4.2. Correlations by Factors Included in the Model</h3>
+                    <ul class="nested">
+                        <p><img src="corr_heatmap.png" alt="corr_heatmap"></p>
+                    </ul>
+                </li>
+
+                <li>
+                    <h3 class="caret" id="section4_3">4.3. Scorecard</h3>
+                    <ul class="nested">
+                        <table>
+                            <tr>
+                                <td><strong>Variable</strong></td>
+                                <td><strong>Value</strong></td>
+                                <td><strong>WOE</strong></td>
+                                <td><strong>COEF</strong></td>
+                                <td><strong>POINTS</strong></td>
+                            </tr>
+                            
+                            <tr>
+                                <td>Intercept</td>
+                                <td>None</td>
+                                <td>None</td>
+                                <td>-1.54</td>
+                                <td>-1.54</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>tariff_id</td>
+                                <td>tariff_id <= 1.05</td>
+                                <td>1.01</td>
+                                <td>-1.29</td>
+                                <td>-1.31</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>tariff_id</td>
+                                <td>1.05 < tariff_id <= 1.13</td>
+                                <td>-0.09</td>
+                                <td>-1.29</td>
+                                <td>0.12</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>tariff_id</td>
+                                <td>1.13 < tariff_id <= 1.28</td>
+                                <td>0.6</td>
+                                <td>-1.29</td>
+                                <td>-0.77</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>tariff_id</td>
+                                <td>1.28 < tariff_id <= 1.36</td>
+                                <td>-0.96</td>
+                                <td>-1.29</td>
+                                <td>1.25</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>tariff_id</td>
+                                <td>tariff_id > 1.36</td>
+                                <td>0.39</td>
+                                <td>-1.29</td>
+                                <td>-0.5</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>tariff_id</td>
+                                <td>__NaN_0__</td>
+                                <td>0</td>
+                                <td>-1.29</td>
+                                <td>0.0</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_month</td>
+                                <td>credit_month <= 5.5</td>
+                                <td>-0.8</td>
+                                <td>-1.24</td>
+                                <td>1.0</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_month</td>
+                                <td>5.5 < credit_month <= 7.5</td>
+                                <td>-0.32</td>
+                                <td>-1.24</td>
+                                <td>0.4</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_month</td>
+                                <td>7.5 < credit_month <= 11.5</td>
+                                <td>0.27</td>
+                                <td>-1.24</td>
+                                <td>-0.33</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_month</td>
+                                <td>11.5 < credit_month <= 14.5</td>
+                                <td>-0.21</td>
+                                <td>-1.24</td>
+                                <td>0.26</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_month</td>
+                                <td>credit_month > 14.5</td>
+                                <td>-0.49</td>
+                                <td>-1.24</td>
+                                <td>0.61</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_month</td>
+                                <td>__NaN_0__</td>
+                                <td>0</td>
+                                <td>-1.24</td>
+                                <td>0.0</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_sum</td>
+                                <td>credit_sum <= 6991.5</td>
+                                <td>-0.79</td>
+                                <td>-0.59</td>
+                                <td>0.47</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_sum</td>
+                                <td>6991.5 < credit_sum <= 10318.44</td>
+                                <td>-0.42</td>
+                                <td>-0.59</td>
+                                <td>0.25</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_sum</td>
+                                <td>10318.44 < credit_sum <= 16759.5</td>
+                                <td>0.1</td>
+                                <td>-0.59</td>
+                                <td>-0.06</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_sum</td>
+                                <td>16759.5 < credit_sum <= 42290.0</td>
+                                <td>-0.05</td>
+                                <td>-0.59</td>
+                                <td>0.03</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_sum</td>
+                                <td>credit_sum > 42290.0</td>
+                                <td>0.43</td>
+                                <td>-0.59</td>
+                                <td>-0.26</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_sum</td>
+                                <td>__NaN_0__</td>
+                                <td>0</td>
+                                <td>-0.59</td>
+                                <td>0.0</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>education_SCH</td>
+                                <td>education_SCH <= 0.0</td>
+                                <td>0.22</td>
+                                <td>-0.66</td>
+                                <td>-0.15</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>education_SCH</td>
+                                <td>education_SCH > 0.0</td>
+                                <td>-0.19</td>
+                                <td>-0.66</td>
+                                <td>0.12</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>education_SCH</td>
+                                <td>__NaN_0__</td>
+                                <td>0</td>
+                                <td>-0.66</td>
+                                <td>0.0</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>age</td>
+                                <td>age <= 21.5</td>
+                                <td>-1.28</td>
+                                <td>-0.84</td>
+                                <td>1.08</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>age</td>
+                                <td>21.5 < age <= 22.5</td>
+                                <td>-0.67</td>
+                                <td>-0.84</td>
+                                <td>0.56</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>age</td>
+                                <td>22.5 < age <= 24.5</td>
+                                <td>-0.29</td>
+                                <td>-0.84</td>
+                                <td>0.24</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>age</td>
+                                <td>24.5 < age <= 57.5</td>
+                                <td>0.11</td>
+                                <td>-0.84</td>
+                                <td>-0.09</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>age</td>
+                                <td>age > 57.5</td>
+                                <td>-0.29</td>
+                                <td>-0.84</td>
+                                <td>0.25</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>age</td>
+                                <td>__NaN_0__</td>
+                                <td>0</td>
+                                <td>-0.84</td>
+                                <td>0.0</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_MAR</td>
+                                <td>marital_status_MAR <= 0.0</td>
+                                <td>-0.19</td>
+                                <td>-0.65</td>
+                                <td>0.12</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_MAR</td>
+                                <td>marital_status_MAR > 0.0</td>
+                                <td>0.17</td>
+                                <td>-0.65</td>
+                                <td>-0.11</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_MAR</td>
+                                <td>__NaN_0__</td>
+                                <td>0</td>
+                                <td>-0.65</td>
+                                <td>0.0</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_UNM</td>
+                                <td>marital_status_UNM <= 0.0</td>
+                                <td>0.12</td>
+                                <td>-0.03</td>
+                                <td>0.0</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_UNM</td>
+                                <td>marital_status_UNM > 0.0</td>
+                                <td>-0.23</td>
+                                <td>-0.03</td>
+                                <td>0.01</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_UNM</td>
+                                <td>__NaN_0__</td>
+                                <td>0</td>
+                                <td>-0.03</td>
+                                <td>0.0</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>score_shk</td>
+                                <td>score_shk <= 0.4</td>
+                                <td>0.18</td>
+                                <td>-1.31</td>
+                                <td>-0.24</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>score_shk</td>
+                                <td>0.4 < score_shk <= 0.65</td>
+                                <td>-0.04</td>
+                                <td>-1.31</td>
+                                <td>0.05</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>score_shk</td>
+                                <td>0.65 < score_shk <= 0.69</td>
+                                <td>-0.18</td>
+                                <td>-1.31</td>
+                                <td>0.24</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>score_shk</td>
+                                <td>0.69 < score_shk <= 0.75</td>
+                                <td>-0.36</td>
+                                <td>-1.31</td>
+                                <td>0.47</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>score_shk</td>
+                                <td>score_shk > 0.75</td>
+                                <td>-0.76</td>
+                                <td>-1.31</td>
+                                <td>1.0</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>score_shk</td>
+                                <td>__NaN_0__</td>
+                                <td>0</td>
+                                <td>-1.31</td>
+                                <td>0.0</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_count</td>
+                                <td>credit_count <= 0.0</td>
+                                <td>-0.19</td>
+                                <td>-0.3</td>
+                                <td>0.06</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_count</td>
+                                <td>0.0 < credit_count <= 1.5</td>
+                                <td>0.05</td>
+                                <td>-0.3</td>
+                                <td>-0.02</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_count</td>
+                                <td>1.5 < credit_count <= 3.5</td>
+                                <td>0.11</td>
+                                <td>-0.3</td>
+                                <td>-0.03</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_count</td>
+                                <td>3.5 < credit_count <= 5.5</td>
+                                <td>-0.01</td>
+                                <td>-0.3</td>
+                                <td>0.0</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_count</td>
+                                <td>credit_count > 5.5</td>
+                                <td>-0.21</td>
+                                <td>-0.3</td>
+                                <td>0.06</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_count</td>
+                                <td>__NaN_0__</td>
+                                <td>0</td>
+                                <td>-0.3</td>
+                                <td>0.0</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>living_region</td>
+                                <td>living_region <= 82.5</td>
+                                <td>-0.06</td>
+                                <td>-0.67</td>
+                                <td>0.04</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>living_region</td>
+                                <td>82.5 < living_region <= 84.5</td>
+                                <td>1.72</td>
+                                <td>-0.67</td>
+                                <td>-1.16</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>living_region</td>
+                                <td>84.5 < living_region <= 105.5</td>
+                                <td>-0.23</td>
+                                <td>-0.67</td>
+                                <td>0.15</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>living_region</td>
+                                <td>105.5 < living_region <= 265.5</td>
+                                <td>0.05</td>
+                                <td>-0.67</td>
+                                <td>-0.03</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>living_region</td>
+                                <td>living_region > 265.5</td>
+                                <td>-0.17</td>
+                                <td>-0.67</td>
+                                <td>0.12</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>living_region</td>
+                                <td>__NaN_0__</td>
+                                <td>0</td>
+                                <td>-0.67</td>
+                                <td>0.0</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>gender_F</td>
+                                <td>gender_F <= 0.0</td>
+                                <td>-0.12</td>
+                                <td>-1.07</td>
+                                <td>0.13</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>gender_F</td>
+                                <td>gender_F > 0.0</td>
+                                <td>0.12</td>
+                                <td>-1.07</td>
+                                <td>-0.13</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>gender_F</td>
+                                <td>__NaN_0__</td>
+                                <td>0</td>
+                                <td>-1.07</td>
+                                <td>0.0</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_SPC</td>
+                                <td>job_position_SPC <= 0.0</td>
+                                <td>-0.24</td>
+                                <td>-0.57</td>
+                                <td>0.13</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_SPC</td>
+                                <td>job_position_SPC > 0.0</td>
+                                <td>0.07</td>
+                                <td>-0.57</td>
+                                <td>-0.04</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_SPC</td>
+                                <td>__NaN_0__</td>
+                                <td>0</td>
+                                <td>-0.57</td>
+                                <td>0.0</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_PNA</td>
+                                <td>job_position_PNA <= 0.0</td>
+                                <td>0.03</td>
+                                <td>-0.5</td>
+                                <td>-0.02</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_PNA</td>
+                                <td>job_position_PNA > 0.0</td>
+                                <td>-0.94</td>
+                                <td>-0.5</td>
+                                <td>0.47</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_PNA</td>
+                                <td>__NaN_0__</td>
+                                <td>0</td>
+                                <td>-0.5</td>
+                                <td>0.0</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_ATP</td>
+                                <td>job_position_ATP <= 0.0</td>
+                                <td>0.01</td>
+                                <td>-0.13</td>
+                                <td>0.0</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_ATP</td>
+                                <td>job_position_ATP > 0.0</td>
+                                <td>-0.63</td>
+                                <td>-0.13</td>
+                                <td>0.08</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_ATP</td>
+                                <td>__NaN_0__</td>
+                                <td>0</td>
+                                <td>-0.13</td>
+                                <td>0.0</td>
+                            </tr>
+                            
+                        </table>
+                        <br />
+                        <span>Missing values processing legend:</span>
+                        <ul>
+                            <li><strong>__NaN__</strong> - separate group with WoE evaluation</li>
+                            <li><strong>__NaN_0__</strong> - separate group with WoE = 0</li>
+                            <li><strong>__NaN_maxfreq__</strong> - added to the most frequent group without WoE
+                                evaluation</li>
+                            <li><strong>__NaN_maxp__</strong> - added to the group with maximum probability without WoE
+                                evaluation</li>
+                            <li><strong>__NaN_minp__</strong> - added to the group with minimum probability without WoE
+                                evaluation</li>
+                        </ul>
+                        <br />
+                        <span>Rare/unknown category processing legend:</span>
+                        <ul>
+                            <li><strong>__Small__</strong> - separate group with WoE evaluation</li>
+                            <li><strong>__Small_nan__</strong> - to the NaN group</li>
+                            <li><strong>__Small_0__</strong> - separate group with WoE = 0</li>
+                            <li><strong>__Small_maxfreq__</strong> - added to the most frequent group without WoE
+                                evaluation</li>
+                            <li><strong>__Small_maxp__</strong> - added to the group with maximum probability without
+                                WoE evaluation</li>
+                            <li><strong>__Small_minp__</strong> - added to the group with minimum probability without
+                                WoE evaluation</li>
+                        </ul>
+                    </ul>
+                </li>
+
+                <li>
+                    <h3 class="caret" id="section4_4">4.4. Feature Selection History</h3>
+                    <ul class="nested">
+                        <table>
+                            <tr>
+                                <td><strong>Feature</strong></td>
+                                <td><strong></strong></td>
+                            </tr>
+                            
+                            <tr>
+                                <td>age</td>
+                                <td>Selected; Gini = 0.1, IV = 0.08</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_count</td>
+                                <td>Selected; Gini = 0.06, IV = 0.01</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_month</td>
+                                <td>Selected; Gini = 0.15, IV = 0.09</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>credit_sum</td>
+                                <td>Selected; Gini = 0.13, IV = 0.07</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>durat_ttime_count</td>
+                                <td>Pruned during regression refit</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>durat_ttime_max</td>
+                                <td>Pruned during regression refit</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>durat_ttime_mean</td>
+                                <td>Pruned during regression refit</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>durat_ttime_min</td>
+                                <td>Pruned during regression refit</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>education_ACD</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>education_GRD</td>
+                                <td>Pruned during regression refit</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>education_PGR</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>education_SCH</td>
+                                <td>Selected; Gini = 0.1, IV = 0.04</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>education_UGR</td>
+                                <td>Pruned during regression refit</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>education_nan</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>gender_F</td>
+                                <td>Selected; Gini = 0.06, IV = 0.01</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>gender_M</td>
+                                <td>Pruned during regression refit</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>gender_nan</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_ATP</td>
+                                <td>Selected; Gini = 0.01, IV = 0.01</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_BIS</td>
+                                <td>Pruned during regression refit</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_BIU</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_DIR</td>
+                                <td>Pruned during regression refit</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_HSK</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_INP</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_INV</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_NOR</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_ONB</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_PNA</td>
+                                <td>Selected; Gini = 0.03, IV = 0.03</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_PNI</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_PNS</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_PNV</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_SPC</td>
+                                <td>Selected; Gini = 0.05, IV = 0.02</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_UMN</td>
+                                <td>Pruned during regression refit</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_WOI</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_WRK</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_WRP</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>job_position_nan</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>latitude</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>latitude_mean</td>
+                                <td>Pruned during regression refit</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>living_region</td>
+                                <td>Selected; Gini = 0.06, IV = 0.04</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>longitude</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>longitude_mean</td>
+                                <td>Pruned during regression refit</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_CIV</td>
+                                <td>Pruned during regression refit</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_DIV</td>
+                                <td>Pruned during regression refit</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_MAR</td>
+                                <td>Selected; Gini = 0.09, IV = 0.03</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_UNM</td>
+                                <td>Selected; Gini = 0.08, IV = 0.03</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_WID</td>
+                                <td>Pruned during regression refit</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>marital_status_nan</td>
+                                <td>NaN values</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>monthly_income</td>
+                                <td>Pruned during regression refit</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>overdue_credit_count</td>
+                                <td>Pruned during regression refit</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>score_shk</td>
+                                <td>Selected; Gini = 0.07, IV = 0.03</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>tariff_id</td>
+                                <td>Selected; Gini = 0.24, IV = 0.22</td>
+                            </tr>
+                            
+                        </table>
+                    </ul>
+                </li>
+
+                <li>
+                    <h3 class="caret" id="section4_5">4.5. Feature Contribution in the Model</h3>
+                    <ul class="nested">
+                        
+                        <p>Required to train the model with a parameter <strong>regularized_refit=False</strong></p>
+                        
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <script type="text/javascript">
+        var toggler = document.getElementsByClassName("caret");
+        var i;
+
+        for (i = 0; i < toggler.length; i++) {
+            toggler[i].addEventListener("click", function () {
+                this.parentElement.querySelector(".nested").classList.toggle("active");
+                this.classList.toggle("caret-down");
+            });
+        }
+    </script>
+</body>
+
+</html>
