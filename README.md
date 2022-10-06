@@ -44,3 +44,6 @@ output/feat_imp.png
 
 Скоры по предсказанию
 output/prediction.csv
+
+Отчет по модели
+reports/autowoe_report.html
